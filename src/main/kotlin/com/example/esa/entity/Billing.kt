@@ -1,4 +1,4 @@
-package com.example.esa.dto
+package com.example.esa.entity
 
 import java.time.LocalDate
 

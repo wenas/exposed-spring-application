@@ -1,5 +1,7 @@
-package com.example.esa.repository
+package com.example.esa.repository.impl
 
+import com.example.esa.repository.BillingRepository
+import com.example.esa.repository.UserRepository
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -10,12 +12,11 @@ import org.springframework.transaction.annotation.Transactional
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
-import java.time.LocalDate
 import java.time.YearMonth
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-internal class BillingRepositoryTest {
+internal class UserRepositoryImplTest {
     companion object {
         @Container
         val postgreSQLContainer = PostgreSQLContainer<Nothing>("postgres:13.3").apply {
@@ -34,31 +35,22 @@ internal class BillingRepositoryTest {
     }
 
     @Autowired
-    lateinit var billingRepository: BillingRepository
+    lateinit var userRepository: UserRepository
 
     @Test
     @Transactional
-    fun 月の課金額をゲームごとに取得する() {
+    fun ユーザーの取得() {
 
-        val marchMap = billingRepository.月の課金額をゲームごとに取得する(1, YearMonth.of(2023, 3))
-        assertEquals(24480, marchMap.get("ブルーアーカイブ"))
-        assertEquals(6250, marchMap.get("アークナイツ"))
+        assertEquals("せち", userRepository.findUserById(1)!!.username)
+        assertEquals("ぷち", userRepository.findUserById(2)!!.username)
     }
 
     @Test
     @Transactional
-    fun 月の課金額リスト() {
+    fun ユーザーがいない場合() {
 
-        val list = billingRepository.月の課金リストを取得(1, YearMonth.of(2023, 4))
-
-        assertEquals(4, list.size)
-        assertEquals(LocalDate.of(2023,4,14), list[0].purchaseDate)
-        assertEquals("アークナイツ", list[0].gameName)
-        assertEquals("汎用特訓パック", list[0].purchasedItem)
-        assertEquals(2000, list[0].amount)
-
+        assertNull(userRepository.findUserById(-1))
     }
-
 
 
 }

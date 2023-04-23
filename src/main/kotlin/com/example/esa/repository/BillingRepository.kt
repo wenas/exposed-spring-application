@@ -1,7 +1,7 @@
 package com.example.esa.repository
 
 import com.example.esa.dsl.BillingHistory
-import com.example.esa.dto.Billing
+import com.example.esa.entity.Billing
 import org.jetbrains.exposed.sql.*
 import org.springframework.stereotype.Repository
 import java.time.YearMonth
