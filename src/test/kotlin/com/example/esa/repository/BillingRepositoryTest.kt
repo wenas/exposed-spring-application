@@ -1,6 +1,10 @@
 package com.example.esa.repository
 
-import org.junit.jupiter.api.Assertions.*
+import com.example.esa.dsl.GameInfo
+import com.example.esa.dsl.GameNameVariants
+import org.jetbrains.exposed.sql.orWhere
+import org.jetbrains.exposed.sql.select
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -41,8 +45,9 @@ internal class BillingRepositoryTest {
     fun 月の課金額をゲームごとに取得する() {
 
         val marchMap = billingRepository.月の課金額をゲームごとに取得する(1, YearMonth.of(2023, 3))
-        assertEquals(24480, marchMap.get("ブルーアーカイブ"))
-        assertEquals(6250, marchMap.get("アークナイツ"))
+        assertEquals(2, marchMap.size)
+        assertEquals(3650, marchMap.get("JJUGクエスト"))
+        assertEquals(26480, marchMap.get("JavaRPG"))
     }
 
     @Test
@@ -52,13 +57,50 @@ internal class BillingRepositoryTest {
         val list = billingRepository.月の課金リストを取得(1, YearMonth.of(2023, 4))
 
         assertEquals(4, list.size)
-        assertEquals(LocalDate.of(2023,4,14), list[0].purchaseDate)
-        assertEquals("アークナイツ", list[0].gameName)
-        assertEquals("汎用特訓パック", list[0].purchasedItem)
+        assertEquals(LocalDate.of(2023, 4, 14), list[0].purchaseDate)
+        assertEquals("JJUGクエスト", list[0].gameName)
+        assertEquals("Java特訓パック", list[0].purchasedItem)
         assertEquals(2000, list[0].amount)
+
+        assertEquals(LocalDate.of(2023, 4, 13), list[1].purchaseDate)
+        assertEquals("JJUGクエスト", list[1].gameName)
+        assertEquals("Spring強化パック", list[1].purchasedItem)
+        assertEquals(1000, list[1].amount)
+
+        assertEquals(LocalDate.of(2023, 4, 12), list[2].purchaseDate)
+        assertEquals("JavaRPG", list[2].gameName)
+        assertEquals("経験値セット", list[2].purchasedItem)
+        assertEquals(2000, list[2].amount)
+
+        assertEquals(LocalDate.of(2023, 4, 11), list[3].purchaseDate)
+        assertEquals("JavaRPG", list[3].gameName)
+        assertEquals("NPE回避装備", list[3].purchasedItem)
+        assertEquals(480, list[3].amount)
 
     }
 
+
+    @Test
+    @Transactional
+    fun 名前取得するクエリ() {
+        GameInfo
+            .slice(GameInfo.id, GameInfo.gameName)
+            .select { GameInfo.gameName eq "JavaRPG" }
+            .forEach { println(it[GameInfo.gameName]) }
+
+        GameInfo
+            .slice(GameInfo.id, GameInfo.gameName)
+            .select {
+                GameInfo.id eqSubQuery
+                        GameNameVariants
+                            .slice(GameNameVariants.gameInfoId)
+                            .select { GameNameVariants.nameVariant eq "JAVA_RPG" }
+            }.orWhere {
+                GameInfo.gameName eq "JAVA_RPG"
+            }
+            .forEach { println(it[GameInfo.gameName]) }
+
+    }
 
 
 }
