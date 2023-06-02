@@ -1,7 +1,6 @@
-package com.example.esa.repository.impl
+package com.example.esa.repository
 
-import com.example.esa.repository.UserRepository
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -14,7 +13,8 @@ import org.testcontainers.junit.jupiter.Testcontainers
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-internal class UserRepositoryImplTest {
+class GameInfoRepositoryTest {
+
     companion object {
         @Container
         val postgreSQLContainer = PostgreSQLContainer<Nothing>("postgres:13.3").apply {
@@ -33,21 +33,25 @@ internal class UserRepositoryImplTest {
     }
 
     @Autowired
-    lateinit var userRepository: UserRepository
+    lateinit var gameInfoRepository: GameInfoRepository
 
     @Test
     @Transactional
-    fun ユーザーの取得() {
+    fun ゲームの一覧が取得できること() {
 
-        assertEquals("せち", userRepository.findUserById(1)!!.username)
-        assertEquals("ぷち", userRepository.findUserById(2)!!.username)
-    }
+        val gameList = gameInfoRepository.登録済みのゲーム名を取得()
 
-    @Test
-    @Transactional
-    fun ユーザーがいない場合() {
+        assertEquals(2, gameList.size)
 
-        assertNull(userRepository.findUserById(-1))
+        assertEquals("JJUGクエスト", gameList[0].gameName)
+        assertEquals("ぺち", gameList[0].companyName)
+        assertEquals(0, gameList[0].nameVariants.size)
+
+        assertEquals("JavaRPG", gameList[1].gameName)
+        assertEquals("ぺち", gameList[1].companyName)
+        assertEquals(2, gameList[1].nameVariants.size)
+
+
     }
 
 

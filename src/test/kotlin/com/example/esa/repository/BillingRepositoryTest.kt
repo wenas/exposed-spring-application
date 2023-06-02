@@ -80,25 +80,18 @@ internal class BillingRepositoryTest {
     }
 
 
+
+
+
     @Test
     @Transactional
-    fun 名前取得するクエリ() {
-        GameInfo
-            .slice(GameInfo.id, GameInfo.gameName)
-            .select { GameInfo.gameName eq "JavaRPG" }
-            .forEach { println(it[GameInfo.gameName]) }
+    fun ゲームIDを指定して課金額を取得する() {
 
-        GameInfo
-            .slice(GameInfo.id, GameInfo.gameName)
-            .select {
-                GameInfo.id eqSubQuery
-                        GameNameVariants
-                            .slice(GameNameVariants.gameInfoId)
-                            .select { GameNameVariants.nameVariant eq "JAVA_RPG" }
-            }.orWhere {
-                GameInfo.gameName eq "JAVA_RPG"
-            }
-            .forEach { println(it[GameInfo.gameName]) }
+        val gameAmount = billingRepository.ゲーム名を指定して課金額を取得する(1, 1)
+
+        assertEquals("JJUGクエスト", gameAmount!!.first)
+        assertEquals(19850, gameAmount!!.second)
+
 
     }
 
